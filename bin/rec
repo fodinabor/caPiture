@@ -1,6 +1,9 @@
 #!/bin/bash
 
 IS_RECORDING=$(ps aux | grep jack_capture | wc -l)
+CHANNEL=2
+CHIP=pwmchip0
+PWM=pwm$CHANNEL
 
 if [ $IS_RECORDING -gt 1 ]; then
     echo "Already recording!"
@@ -13,12 +16,16 @@ blink
 sleep 2
 
 FILE=$(date +%s).wav
-meter_to_pwm &
+ports=$(jack_lsp -c | grep -P "^system:capture_" | awk '{print $1}' | tr '\n' ' ')
+jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${ports} 2> /dev/null &
 METER_TO_PWM_PID=$!
 
 jack_capture -fn $FILE -ns -p system:capture_*
 
 kill ${METER_TO_PWM_PID}
+
+blink
+sleep 1
 
 exit_trap () {
     steady

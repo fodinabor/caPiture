@@ -1,7 +1,0 @@
-#!/bin/bash
-
-ports=$(jack_lsp -c | grep -P "^system:capture_" | awk '{print $1}' | tr '\n' ' ')
-while true; do
-    meter=$(jack_meter -n -r 0 -l ${ports} 2> /dev/null)
-    pwm 240000 $(echo $meter | awk '{print $2 * 2400}')
-done
