@@ -1,22 +1,35 @@
 #!/bin/bash
 
-# Start listening for buttons on pin 3 and 4
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+export PATH="$SCRIPT_DIR:$PATH"
+
+# Start listening for buttons on pin 4 and 17
 hotkeys &
+HOTKEYS_PID=$!
 
 # Add a fake X session
-echo "DISPLAY=:0" > "$HOME/bin/setsession"
-dbus-launch >> "$HOME/bin/setsession"
-chmod +x "$HOME/bin/setsession"
-. "$HOME/bin/setsession"
+echo "DISPLAY=:0" > "$SCRIPT_DIR/setsession"
+dbus-launch >> "$SCRIPT_DIR/setsession"
+chmod +x "$SCRIPT_DIR/setsession"
+. "$SCRIPT_DIR/setsession"
 
 export DISPLAY
 export DBUS_SESSION_BUS_ADDRESS
 export DBUS_SESSION_BUS_PID
 
 # Start JACK server
-jackd -dalsa -dhw:X18XR18 -r44100 -p2048 -n3 &
+jackd -dalsa -dhw:"Microphone" -r44100 -p2048 -n3 &
+JACKD_PID=$!
+
+exit_trap () {
+    kill $HOTKEYS_PID
+    kill $JACKD_PID
+}
+trap exit_trap EXIT
 
 # Light up LED on pin 18 if JACK is available
 jack_wait -w
-steady &
+steady
 
+
+wait

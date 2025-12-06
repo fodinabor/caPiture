@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Usage: pwm <period in ns> <duty cycle in ns>
+
+PERIOD=240000
+DUTY_CYCLE=120000
+
+if [ $# -eq 2 ]; then
+    PERIOD=$1
+    DUTY_CYCLE=$2
+fi
+
+CHANNEL=2
+CHIP=pwmchip0
+PWM=pwm$CHANNEL
+
+if [ ! -d /sys/class/pwm/$CHIP/$PWM ]; then
+    echo $CHANNEL > /sys/class/pwm/$CHIP/export
+    sleep 1
+fi
+
+# first reset duty cycle to 0 before changing period
+echo 0 > /sys/class/pwm/$CHIP/$PWM/duty_cycle
+echo $PERIOD > /sys/class/pwm/$CHIP/$PWM/period
+echo $DUTY_CYCLE > /sys/class/pwm/$CHIP/$PWM/duty_cycle
+echo 1 > /sys/class/pwm/$CHIP/$PWM/enable

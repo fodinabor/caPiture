@@ -2,20 +2,25 @@
 
 IS_RECORDING=$(ps aux | grep jack_capture | wc -l)
 
-if [ $IS_RECORDING = 2 ]; then
-    # Stop running recording
-    pkill -SIGTERM jack_capture
-else
-    # Start recording and blinking
-    blink &
-    BLINK_PID=$!
-
-    FILE=$(date +%s).wav
-    jack_capture -fn $FILE -d 480 -p system:capture_*
-
-    #cp $filename /media/usb0/
-
-    kill $BLINK_PID
-    steady &
+if [ $IS_RECORDING -gt 1 ]; then
+    echo "Already recording!"
+    exit 1
 fi
 
+# Start recording and blinking
+blink
+
+sleep 2
+
+FILE=$(date +%s).wav
+meter_to_pwm &
+METER_TO_PWM_PID=$!
+
+jack_capture -fn $FILE -ns -p system:capture_*
+
+kill ${METER_TO_PWM_PID}
+
+exit_trap () {
+    steady
+}
+trap exit_trap EXIT
