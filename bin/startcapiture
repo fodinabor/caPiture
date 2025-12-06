@@ -30,6 +30,3 @@ trap exit_trap EXIT
 # Light up LED on pin 18 if JACK is available
 jack_wait -w
 steady
-
-
-wait
