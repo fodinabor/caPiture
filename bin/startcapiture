@@ -6,26 +6,36 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PATH="$SCRIPT_DIR:$PATH"
 
 # Add a fake X session
-echo "DISPLAY=:0" > "$SCRIPT_DIR/setsession"
-dbus-launch >> "$SCRIPT_DIR/setsession"
-chmod +x "$SCRIPT_DIR/setsession"
-. "$SCRIPT_DIR/setsession"
+echo "DISPLAY=:0" > "/tmp/capituresetsession"
+dbus-launch >> "/tmp/capituresetsession"
+chmod +x "/tmp/capituresetsession"
+. "/tmp/capituresetsession"
 
 export DISPLAY
 export DBUS_SESSION_BUS_ADDRESS
 export DBUS_SESSION_BUS_PID
 
+HOTKEYS_PID=
+JACK_PID=
+
+setup_exit_trap() {
+    exit_trap () {
+        if [ -n "$HOTKEYS_PID" ]; then
+            kill $HOTKEYS_PID
+        fi
+        if [ -n "$JACKD_PID" ]; then
+            kill $JACKD_PID
+        fi
+        error
+    }
+    trap exit_trap EXIT
+}
+
 start_jack () {
     # Start JACK server
     jackd -dalsa -dhw:"Microphone" -r44100 -p2048 -n3 &
     JACKD_PID=$!
-
-    exit_trap () {
-        kill $HOTKEYS_PID
-        kill $JACKD_PID
-        error
-    }
-    trap exit_trap EXIT
+    setup_exit_trap
 }
 
 start_jack    
@@ -39,5 +49,6 @@ steady
 # Start listening for buttons on pin 4 and 17
 hotkeys &
 HOTKEYS_PID=$!
+setup_exit_trap
 
 wait

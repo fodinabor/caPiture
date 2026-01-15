@@ -1,0 +1,12 @@
+[Unit]
+Description=Start capture script at boot
+After=network.target
+
+[Service]
+Type=simple
+User=joachim
+ExecStart=/usr/local/bin/startcapiture
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
