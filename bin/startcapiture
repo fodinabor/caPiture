@@ -5,10 +5,6 @@ error
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PATH="$SCRIPT_DIR:$PATH"
 
-# Start listening for buttons on pin 4 and 17
-hotkeys &
-HOTKEYS_PID=$!
-
 # Add a fake X session
 echo "DISPLAY=:0" > "$SCRIPT_DIR/setsession"
 dbus-launch >> "$SCRIPT_DIR/setsession"
@@ -39,5 +35,9 @@ while ! jack_wait -w -t 10; do
 done
 
 steady
+
+# Start listening for buttons on pin 4 and 17
+hotkeys &
+HOTKEYS_PID=$!
 
 wait
