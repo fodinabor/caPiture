@@ -1,0 +1,8 @@
+[Unit]
+Description=Nextcloud Sync Slice
+DefaultDependencies=no
+Before=slices.target
+
+[Slice]
+CPUQuota=30%
+MemoryMax=2G

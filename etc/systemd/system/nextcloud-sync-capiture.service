@@ -1,0 +1,13 @@
+[Unit]
+Description=Start nextcloud sync
+After=network.target
+
+[Service]
+Type=simple
+User=joachim
+ExecStart=/usr/bin/nextcloudcmd -n --non-interactive --path Aufnahmen /home/joachim/Musik https://next.joameyer.de
+TimeoutStartSec=300
+Slice=nextcloud-sync.slice
+
+[Install]
+WantedBy=default.target
