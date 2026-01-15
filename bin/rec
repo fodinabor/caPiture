@@ -21,7 +21,7 @@ record () {
     jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${ports} 2> /dev/null &
     METER_TO_PWM_PID=$!
 
-    jack_capture -fn $FILE -ns -p system:capture_*
+    jack_capture -fn $FILE -ns -p system:capture_* -dm -dc
 
     kill ${METER_TO_PWM_PID}
 
@@ -36,6 +36,8 @@ record () {
 
 record &
 
-while [ $(ps aux | grep jack_capture | wc -l) -eq 0 ]; do
+# eq 1 means only the grep process is found
+while [ $(ps aux | grep jack_capture | wc -l) -eq 1 ]; do
+    echo "jack_capture not started yet, waiting..."
     sleep 1
 done

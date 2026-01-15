@@ -8,12 +8,12 @@ do
     sleep 0.5
     BTN2=$(gpioget -c $chip --numeric 4)$(gpioget -c $chip --numeric 17)
 
-    if [ $BTN1 != $BTN2 ]; then continue; fi
+    if [ "$BTN1" != "$BTN2" ]; then continue; fi
 
-    if [ $BTN1 = "10" ]; then
+    if [ "$BTN1" = "10" ]; then
        rec
     fi
-    if [ $BTN1 = "01" ]; then
+    if [ "$BTN1" = "01" ]; then
         pkill -SIGTERM jack_capture;
     fi
     # if [ $BTN1 = "11" ]; then sudo poweroff; fi
