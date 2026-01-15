@@ -1,6 +1,6 @@
 #!/bin/bash
 
-FILE=$HOME/Musik/$(date +%s).wav
+FILE=$HOME/Musik/$(date +%F-%H_%M_%S).wav
 CHANNEL=2
 CHIP=pwmchip0
 PWM=pwm$CHANNEL
@@ -16,18 +16,26 @@ blink
 
 sleep 2
 
-ports=$(jack_lsp -c | grep -P "^system:capture_" | awk '{print $1}' | tr '\n' ' ')
-jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${ports} 2> /dev/null &
-METER_TO_PWM_PID=$!
+record () {
+    ports=$(jack_lsp -c | grep -P "^system:capture_" | awk '{print $1}' | tr '\n' ' ')
+    jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${ports} 2> /dev/null &
+    METER_TO_PWM_PID=$!
 
-jack_capture -fn $FILE -ns -p system:capture_*
+    jack_capture -fn $FILE -ns -p system:capture_*
 
-kill ${METER_TO_PWM_PID}
+    kill ${METER_TO_PWM_PID}
 
-blink
-sleep 1
+    blink
+    sleep 1
 
-exit_trap () {
-    steady
+    exit_trap () {
+        steady
+    }
+    trap exit_trap EXIT
 }
-trap exit_trap EXIT
+
+record &
+
+while [ $(ps aux | grep jack_capture | wc -l) -eq 0 ]; do
+    sleep 1
+done

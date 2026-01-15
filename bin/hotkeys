@@ -11,7 +11,7 @@ do
     if [ $BTN1 != $BTN2 ]; then continue; fi
 
     if [ $BTN1 = "10" ]; then
-       rec &
+       rec
     fi
     if [ $BTN1 = "01" ]; then
         pkill -SIGTERM jack_capture;

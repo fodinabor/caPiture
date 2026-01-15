@@ -1,5 +1,7 @@
 #!/bin/bash
 
+error
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PATH="$SCRIPT_DIR:$PATH"
 
@@ -17,18 +19,25 @@ export DISPLAY
 export DBUS_SESSION_BUS_ADDRESS
 export DBUS_SESSION_BUS_PID
 
-# Start JACK server
-jackd -dalsa -dhw:"Microphone" -r44100 -p2048 -n3 &
-JACKD_PID=$!
+start_jack () {
+    # Start JACK server
+    jackd -dalsa -dhw:"Microphone" -r44100 -p2048 -n3 &
+    JACKD_PID=$!
 
-exit_trap () {
-    kill $HOTKEYS_PID
-    kill $JACKD_PID
+    exit_trap () {
+        kill $HOTKEYS_PID
+        kill $JACKD_PID
+        error
+    }
+    trap exit_trap EXIT
 }
-trap exit_trap EXIT
 
-# Light up LED on pin 18 if JACK is available
-jack_wait -w
+start_jack    
+while ! jack_wait -w -t 10; do
+    echo "JACK server not started, retrying..."
+    start_jack
+done
+
 steady
 
 wait
