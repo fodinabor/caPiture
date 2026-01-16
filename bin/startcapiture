@@ -2,6 +2,9 @@
 
 error
 
+# Log IP info
+ip addr > $HOME/Musik/ipinfo.txt
+
 DEVICE_NAME="X18XR18"
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
