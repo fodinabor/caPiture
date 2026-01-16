@@ -17,11 +17,13 @@ blink
 sleep 2
 
 record () {
-    ports=$(jack_lsp -c | grep -P "^system:capture_" | awk '{print $1}' | tr '\n' ' ')
+    ports="system:capture_1    system:capture_2    system:capture_3    system:capture_4    system:capture_17    system:capture_18"
+    capture_ports="-p system:capture_1 -p system:capture_2 -p system:capture_3 -p system:capture_4 -p system:capture_17 -p system:capture_18"
+    # ports=$(jack_lsp -c | grep -P "^system:capture_" | awk '{print $1}' | tr '\n' ' ')
     jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${ports} 2> /dev/null &
     METER_TO_PWM_PID=$!
 
-    jack_capture -fn $FILE -ns -p system:capture_* -dm -dc
+    jack_capture -fn $FILE -ns -dm -dc ${capture_ports}
 
     kill ${METER_TO_PWM_PID}
 
