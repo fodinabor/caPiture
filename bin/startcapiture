@@ -2,6 +2,8 @@
 
 error
 
+DEVICE_NAME="X18XR18"
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PATH="$SCRIPT_DIR:$PATH"
 
@@ -33,7 +35,7 @@ setup_exit_trap() {
 
 start_jack () {
     # Start JACK server
-    jackd -dalsa -dhw:"Microphone" -r44100 -p2048 -n3 &
+    jackd -dalsa -dhw:"$DEVICE_NAME" -r44100 -p2048 -n3 &
     JACKD_PID=$!
     setup_exit_trap
 }
@@ -50,5 +52,21 @@ steady
 hotkeys &
 HOTKEYS_PID=$!
 setup_exit_trap
+
+DEVICE="/proc/asound/$DEVICE_NAME"
+
+while true; do
+    if [ ! -d "$DEVICE" ]; then
+        pkill jackd
+        error
+        start_jack
+        while ! jack_wait -w -t 10; do
+            echo "JACK server not started, retrying..."
+            start_jack
+        done
+        steady
+    fi
+    sleep 1
+done
 
 wait
