@@ -18,13 +18,14 @@ sleep 2
 
 record () {
     ports="1 2 3 4 17 18"
-    meter_ports=$(for port in ${ports}; do echo "-p system:capture_$port"; done)
+    meter_ports=$(for port in ${ports}; do echo " system:capture_$port"; done)
     jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${meter_ports} 2> /dev/null &
     METER_TO_PWM_PID=$!
 
     CAPTURE_JOBS=""
     for port in ${ports}; do
-        jack_capture -fn $FILE_$port.wav -ns -dm -dc system:capture_${port} &
+        normalized_port=$(echo $port | sed "s/ //g")
+        jack_capture -fn ${FILE}_${normalized_port}.wav -ns -dm -dc -p system:capture_${port} &
         CAPTURE_JOBS="$CAPTURE_JOBS $!"
     done
     # Jack captures should be killed by hotkey.
