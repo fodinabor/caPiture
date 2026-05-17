@@ -5,7 +5,7 @@ After=network.target
 [Service]
 Type=simple
 User=joachim
-ExecStart=/usr/bin/nextcloudcmd -n --non-interactive --path Aufnahmen /home/joachim/Musik https://next.joameyer.de
+ExecStart=/usr/bin/nextcloudcmd -n --non-interactive --path Uploads /home/joachim/Musik https://cloud.kirche-die-bewegt.de
 TimeoutStartSec=300
 Slice=nextcloud-sync.slice
 
