@@ -3,7 +3,11 @@
 error
 
 # Log IP info
-ip addr > $HOME/Musik/ipinfo.txt
+log_ip_info () {
+    sleep 60
+    ip addr > $HOME/Musik/ipinfo.txt
+}
+log_ip_info &
 
 DEVICE_NAME="X18XR18"
 
