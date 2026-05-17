@@ -17,7 +17,7 @@ blink
 sleep 2
 
 record () {
-    ports="1 2 3 4 17 18"
+    ports="4 18"
     meter_ports=$(for port in ${ports}; do echo " system:capture_$port"; done)
     jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${meter_ports} 2> /dev/null &
     METER_TO_PWM_PID=$!
