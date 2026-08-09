@@ -9,7 +9,25 @@ log_ip_info () {
 }
 log_ip_info &
 
-DEVICE_NAME="X18XR18"
+get_available_X_device () {
+    # read /proc/asound/cards and find either XUSB or X18X18
+    for card in /proc/asound/cards; do
+        if grep -q "XUSB" "$card"; then
+            echo "XUSB"
+            return 0
+        elif grep -q "X18X18" "$card"; then
+            echo "X18X18"
+            return 0
+        fi
+    done
+    return 1
+}
+
+DEVICE_NAME=$(get_available_X_device)
+if [ -z "$DEVICE_NAME" ]; then
+    DEVICE_NAME="XUSB" # default to XUSB if no device found and hope it comes back online
+fi
+export DEVICE_NAME
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export PATH="$SCRIPT_DIR:$PATH"

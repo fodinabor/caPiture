@@ -17,7 +17,11 @@ blink
 sleep 2
 
 record () {
-    ports="4 18"
+    if [ $DEVICE_NAME == "XUSB" ]; then
+        ports="17 18"
+    elif [ $DEVICE_NAME == "X18X18" ]; then
+        ports="4 18"
+    fi
     meter_ports=$(for port in ${ports}; do echo " system:capture_$port"; done)
     jack_meter -n -r 0 -l /sys/class/pwm/$CHIP/$PWM/ ${meter_ports} 2> /dev/null &
     METER_TO_PWM_PID=$!
